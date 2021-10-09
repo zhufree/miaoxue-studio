@@ -1,6 +1,6 @@
-.xls
-.xlsx
-.png
-.ttc
-.ttf
-.jpg
+*.xlsx
+*.png
+*.ttc
+*.ttf
+*.jpg
+*.json
