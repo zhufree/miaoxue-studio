@@ -2,6 +2,9 @@ import json
 import xlrd
 from xlutils.copy import copy
 import sqlite3
+import os
+import xlwt
+from xlwt import Workbook
 
 
 def json_2_excel():
@@ -113,6 +116,8 @@ def class_name_excel(school_name):
         worksheet.write(1, 1, '姓名', set_style())
         worksheet.write(1, 2, '班级', set_style())
         worksheet.write(1, 3, '电话号码', set_style())
+        for i in range(4, 18):
+            worksheet.write(1, i, str(i-3), set_style())
 
         # 保存Excel book.save('path/文件名称.xls')
         book.save(filename)
@@ -128,13 +133,35 @@ def class_name_excel(school_name):
         write_book.save("{}班级名单.xls".format(s.name))
 
 
+def generate_class_name():
+    # 课程表
+    write_book = copy(xlrd.open_workbook('class.xls', formatting_info=True))
+    w_sheet = write_book.get_sheet(0)
+    start_row = 3
+    for i in [
+        '万家', 
+        # '濮家', 
+        # '笕新'
+    ]:
+        read_book = xlrd.open_workbook("{}名单.xls".format(i))
+        class_sheets = read_book.sheets()
+        for s in class_sheets:
+            w_sheet.write(start_row, 0, start_row-1)
+            w_sheet.write(start_row, 1, '濮小未来工程师社团{}校区{}'.format(i, s.name.replace(i, '')))
+            w_sheet.write(start_row, 2, s.cell_value(1, 8)[0:2] + '16:20-18:00')
+            start_row += 1
+    write_book.save('class.xls')
+
+
+
 if __name__ == '__main__':
     # sqlite_2_excel()
     # json_2_excel()
+    # generate_class_name()
     for i in [
     '万家', 
-    '濮家', 
-    '笕新'
+    # '濮家', 
+    # '笕新'
     ]:
-        # poster(i)
+    #     # poster(i)
         class_name_excel(i)
