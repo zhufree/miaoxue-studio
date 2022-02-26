@@ -1,0 +1,21 @@
+import turtle
+
+# 六芒星
+turtle.fd(100)
+turtle.rt(120)
+turtle.fd(100)
+turtle.rt(120)
+turtle.fd(100)
+turtle.rt(120)
+# turtle.penup()
+turtle.fd(33)
+turtle.lt(60)
+turtle.fd(33)
+# turtle.pendown()
+turtle.rt(120)
+turtle.fd(100)
+turtle.rt(120)
+turtle.fd(100)
+turtle.rt(120)
+turtle.fd(100)
+turtle.rt(120)
