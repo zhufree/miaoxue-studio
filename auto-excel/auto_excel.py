@@ -33,6 +33,10 @@ def json_2_excel():
 def sqlite_2_excel():
     read_book = xlrd.open_workbook("applications.xls")
     write_book = copy(read_book)
+    all_classes = []
+    # only keep one sheet for total application
+    write_book._Workbook__worksheets = [write_book._Workbook__worksheets[0]]
+    # print([i.name for i in write_book._Workbook__worksheets])
     sheet = write_book.get_sheet(0)
     sheet.write(0, 0, 'id')
     sheet.write(0, 1, '学生姓名')
@@ -41,8 +45,7 @@ def sqlite_2_excel():
     sheet.write(0, 4, '学生校区')
     sheet.write(0, 5, '电话号码')
     sheet.write(0, 6, '班主任')
-    # 传入数据库路径，db.s3db或者test.sqlite
-    conn=sqlite3.connect('E:/chuangxi-class/.tmp/data.db')
+    conn=sqlite3.connect('E:/xichuang-backend/.tmp/data.db')
     c=conn.cursor()
     mysel=c.execute("select studentName, class, studentClass, studentSchool, phoneNumber, headTeacher from applications")
     _id = 1
@@ -52,9 +55,17 @@ def sqlite_2_excel():
         for j, value in enumerate(row):
             if j == 1:
                 #replace class name
-                sheet.write(i+1, j+1, get_class_name(value))
+                class_name = get_class_name(value)
+                sheet.write(i+1, j+1, class_name)
+                if value not in all_classes:
+                    all_classes.append(value)
             else:
                 sheet.write(i+1, j+1, value)
+    # split class into different sheet
+    # for c in all_classes:
+    #     class_name = get_class_name(c)[0]
+    #     print(class_name)
+    #     sheet = write_book.add_sheet(class_name)
     write_book.save('applications.xls')
 
 
@@ -62,13 +73,13 @@ def get_class_name(_id):
     if _id == 'undefined':
         return '无'
     else:
-        conn=sqlite3.connect('E:/chuangxi-class/.tmp/data.db')
+        conn=sqlite3.connect('E:/xichuang-backend/.tmp/data.db')
         c=conn.cursor()
         mysel=c.execute("select name from classes where id = {}".format(_id))
         for i in mysel:
             return i
 
-
+default_size = 220
 def set_style(name='宋体', height=220, bold=False):
     style = xlwt.XFStyle()  # 初始化样式
     
@@ -108,7 +119,7 @@ def class_name_excel(school_name):
             os.remove(filename)
         book = Workbook(encoding='utf-8')
         worksheet = book.add_sheet('Sheet 1')
-        worksheet.write_merge(0, 0, 0, 3, '{}班级名单'.format(s.name),set_style(height=260))
+        worksheet.write_merge(0, 0, 0, 16, '{}班级名单'.format(s.name),set_style(height=260))
         worksheet.col(0).width = 220*5
         worksheet.col(2).width = 220*7
         worksheet.col(3).width = 220*15
@@ -116,8 +127,11 @@ def class_name_excel(school_name):
         worksheet.write(1, 1, '姓名', set_style())
         worksheet.write(1, 2, '班级', set_style())
         worksheet.write(1, 3, '电话号码', set_style())
-        for i in range(4, 18):
-            worksheet.write(1, i, str(i-3), set_style())
+        for i in range(0, 13):
+            worksheet.write(1, 4+i, str(i+1), set_style())
+            worksheet.col(4+i).width = 220*5
+        # for i in range(4, 18):
+        #     worksheet.write(1, i, str(i-3), set_style())
 
         # 保存Excel book.save('path/文件名称.xls')
         book.save(filename)
@@ -153,15 +167,14 @@ def generate_class_name():
     write_book.save('class.xls')
 
 
-
 if __name__ == '__main__':
-    # sqlite_2_excel()
+    sqlite_2_excel()
     # json_2_excel()
     # generate_class_name()
-    for i in [
-    '万家', 
+    # for i in [
+    # '万家', 
     # '濮家', 
     # '笕新'
-    ]:
+    # ]:
     #     # poster(i)
-        class_name_excel(i)
+    # class_name_excel('夏衍创客')

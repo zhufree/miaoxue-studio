@@ -19,4 +19,4 @@ class_content = '本节课{class_content}。'
 special_student = '{name}同学{}，表现出色，提出表扬{emoji}。'
 
 
-print(time_msg)
+print(get_time() + class_intro + class_content)
