@@ -39,24 +39,26 @@ def sqlite_2_excel():
     # print([i.name for i in write_book._Workbook__worksheets])
     sheet = write_book.get_sheet(0)
     sheet.write(0, 0, 'id')
-    sheet.write(0, 1, '学生姓名')
-    sheet.write(0, 2, '课程名')
+    sheet.write(0, 1, '课程名')
+    sheet.write(0, 2, '学生姓名')
     sheet.write(0, 3, '学生班级')
     sheet.write(0, 4, '学生校区')
     sheet.write(0, 5, '电话号码')
     sheet.write(0, 6, '班主任')
+    sheet.write(0, 7, '课程校区')
     conn=sqlite3.connect('E:/xichuang-backend/.tmp/data.db')
     c=conn.cursor()
-    mysel=c.execute("select studentName, class, studentClass, studentSchool, phoneNumber, headTeacher from applications")
+    mysql=c.execute("select id, student_name, student_class_num, student_school, phone_number, teacher_name from class_applications")
     _id = 1
-    for i, row in enumerate(mysel):
+    for i, row in enumerate(mysql):
         sheet.write(i+1, 0, _id)
         _id = _id + 1
         for j, value in enumerate(row):
-            if j == 1:
+            if j == 0:
                 #replace class name
-                class_name = get_class_name(value)
+                class_name, class_school = get_class_name(value)
                 sheet.write(i+1, j+1, class_name)
+                sheet.write(i+1, j+7, class_school)
                 if value not in all_classes:
                     all_classes.append(value)
             else:
@@ -75,9 +77,11 @@ def get_class_name(_id):
     else:
         conn=sqlite3.connect('E:/xichuang-backend/.tmp/data.db')
         c=conn.cursor()
-        mysel=c.execute("select name from classes where id = {}".format(_id))
-        for i in mysel:
-            return i
+        class_id=c.execute("select class_id from class_applications_class_links where class_application_id = {}".format(_id))
+        for i in class_id:
+            class_name = c.execute("select name, school_name from classes where id = {}".format(i[0]))
+            for j in class_name:
+                return j
 
 default_size = 220
 def set_style(name='宋体', height=220, bold=False):
